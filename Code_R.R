@@ -1,7 +1,7 @@
 
-PM25 <- readRDS("~/summarySCC_PM25.rds")
+PM25 <- readRDS("C:/Users/phsch/OneDrive/Bureau/Online Course/Coursera/jhu/data sciences/Exploratory Data Analysis Week 4 Course Project 2/summarySCC_PM25.rds")
 
-Class_Code <- readRDS("~/Source_Classification_Code.rds")
+Class_Code <- readRDS("C:/Users/phsch/OneDrive/Bureau/Online Course/Coursera/jhu/data sciences/Exploratory Data Analysis Week 4 Course Project 2/Source_Classification_Code.rds")
 
 library(tidyverse)
 library(ggplot2)
@@ -158,3 +158,43 @@ ggplot(Q5_6) +
   theme(plot.title = element_text(hjust = 0.5))
 
 dev.off()
+
+### Question 6 ###
+# Compare emissions from motor vehicle sources in Baltimore 
+# City with emissions from motor vehicle sources in Los Angeles 
+# County, California (fips == "06037"). Which city has seen 
+# greater changes over time in motor vehicle emissions?
+
+
+# data & preatrement
+## PM25 (Baltimore & Los Angeles)
+  Q6_0 <- PM25
+  Q6_0_BaCa <- subset(Q6_0, Q6_0$fips == "24510" | Q6_0$fips == "06037")
+
+  #merge
+  Q6_1 <- Class_Code
+  Q6_2_vehicle <- merge(Q6_1,Q6_0_BaCa,by="SCC")
+  
+  
+  Q6_3_car <- subset(Q6_2_vehicle, Q6_2_vehicle$type == "ON-ROAD")
+
+  
+  Q6_3_car_2 <- aggregate(Q6_3_car$Emissions ~ Q6_3_car$year + Q6_3_car$fips,
+                           Q6_3_car, sum)
+  
+  
+  # png
+  png("Plot6.png",width=480,height=480)
+  
+  ggplot(Q6_3_car_2) + 
+    geom_line(aes(`Q6_3_car$year`,
+                  `Q6_3_car$Emissions`,
+                  col = `Q6_3_car$fips`)) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    labs(x = "Years",
+         y = "Emissions",
+         title = "Emissions motor vehicle sources in Baltimore & in Los Angeles")
+  
+    dev.off()
+  
+  
